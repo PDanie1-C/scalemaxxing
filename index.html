@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lexical Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="page">
+
+    <header class="page-header">
+      <h1>Lexical Analyzer</h1>
+      <p class="subtitle">
+        Type or paste code, or upload a .txt file. Each line is tokenized as you type.
+      </p>
+    </header>
+
+    <!-- Input -->
+    <section class="input-section">
+      <textarea id="source-input" spellcheck="false" placeholder="Type code here…"></textarea>
+
+      <div class="toolbar">
+        <button id="analyze-button" class="button button-primary" type="button">Analyze</button>
+
+        <label for="file-input" class="button">Upload .txt</label>
+        <input id="file-input" type="file" accept=".txt,text/plain">
+
+        <button id="clear-button" class="button" type="button">Clear</button>
+
+        <span id="stats" class="stats"></span>
+      </div>
+    </section>
+
+    <!-- Results, filled in by js/app.js -->
+    <section id="results" class="results" aria-live="polite"></section>
+
+    <!-- Plain-text version of the results (same format as the C# output.txt) -->
+    <details class="plain-output">
+      <summary>Plain-text output</summary>
+      <div class="plain-output-actions">
+        <button id="copy-button" class="button" type="button">Copy</button>
+        <span id="copy-message" class="muted"></span>
+      </div>
+      <pre id="plain-output"></pre>
+    </details>
+
+  </main>
+
+  <!-- Order matters: lexer.js defines Lexer, which app.js uses -->
+  <script src="lexer.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
