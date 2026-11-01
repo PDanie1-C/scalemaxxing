@@ -1,0 +1,202 @@
+/* ==========================================================================
+   Lexical Analyzer styles
+
+   1. Theme variables (light + dark)
+   2. Base
+   3. Layout
+   4. Buttons and inputs
+   5. Results
+   6. Token colors
+   7. Plain-text output
+   ========================================================================== */
+
+
+/* 1. Theme variables
+   -------------------------------------------------------------------------- */
+
+:root {
+ color-scheme: dark;
+  --color-bg: #161615;
+  --color-surface: #21211f;
+  --color-text: #ecebe6;
+  --color-muted: #9a9890;
+  --color-border: #3a3a36;
+  --color-accent: #7aa2ff;
+  --color-on-accent: #101010;
+
+  --token-keyword: #c39bff;
+  --token-operator: #ffb072;
+  --token-punctuation: #aab2c0;
+  --token-identifier: #6fd9a0;
+  --token-literal: #8ebcff;
+  --token-invalid: #ff8a7a;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+
+/* 2. Base
+   -------------------------------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: 15px/1.5 var(--font-sans);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+
+/* 3. Layout
+   -------------------------------------------------------------------------- */
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  color: var(--color-muted);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 10px 0 18px;
+}
+
+.stats {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+
+/* 4. Buttons and inputs
+   -------------------------------------------------------------------------- */
+
+#source-input {
+  width: 100%;
+  min-height: 180px;
+  padding: 12px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: 14px/1.5 var(--font-mono);
+}
+
+.button {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* The real file input is hidden; the "Upload .txt" label acts as its button */
+#file-input {
+  display: none;
+}
+
+
+/* 5. Results
+   -------------------------------------------------------------------------- */
+
+.line-card {
+  margin-bottom: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.line-card-title {
+  margin: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font: 600 12px var(--font-mono);
+}
+
+/* Lets wide tables scroll sideways instead of stretching the page */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 14px var(--font-mono);
+}
+
+.token-table td {
+  padding: 5px 12px;
+  white-space: pre;
+}
+
+.token-text {
+  width: 50%;
+}
+
+.token-type {
+  text-align: right;
+}
+
+
+/* 6. Token colors
+   -------------------------------------------------------------------------- */
+
+.kind-keyword     { color: var(--token-keyword); }
+.kind-operator    { color: var(--token-operator); }
+.kind-punctuation { color: var(--token-punctuation); }
+.kind-identifier  { color: var(--token-identifier); }
+.kind-literal     { color: var(--token-literal); }
+.kind-invalid     { color: var(--token-invalid); font-weight: 600; }
+
+
+/* 7. Plain-text output
+   -------------------------------------------------------------------------- */
+
+.plain-output {
+  margin-top: 16px;
+}
+
+.plain-output-actions {
+  margin: 10px 0;
+}
+
+#plain-output {
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 13px;
+}
