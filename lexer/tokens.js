@@ -12,6 +12,8 @@ export const Tokens = Object.freeze({
   RELATIONAL_OP: 'RELATIONAL_OP',
   LINK_OP:       'LINK_OP',
   DELIMITER:     'DELIMITER',
+  INDENT:        'INDENT',
+  DEDENT:        'DEDENT',
   ERROR:         'ERROR',
 });
 
@@ -67,7 +69,7 @@ export const NOISE_WORDS = Object.freeze({
   whenever:  'when',
 });
 
-// helper pang-create ng lexeme object
-export function createLexeme(token, value) {
-  return { token, value };
+// helper pang-create ng lexeme object na may line at column
+export function createLexeme(token, value, line = 1, col = 1) {
+  return { token, value, line, col };
 }

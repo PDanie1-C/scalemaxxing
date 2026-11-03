@@ -6,364 +6,660 @@ import {
   createLexeme,
 } from './tokens.js';
 
-import {
-  transitionTable,
-  getTableColumn,
-  Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12,
-  Q13, Q14, Q15, Q16, Q17, Q18, Q19, Q19b, Q20, Q21,
-  Q22, Q23, Q24, Q25, Q26, Q27, Q28, Q29,
-  Q30, Q31, Q32, Q34, Q35, Q36, Q36_TERM,
-  Q37, Q38, Q39, Q40, Q41, Q42, Q43, Q44, Q45, Q46,
-  Q47, Q48, Q49, Q50, Q51, Q52, Q53, Q54,
-  Q55, Q56, Q57, Q58, Q59, Q60, Q61, Q62, Q63, Q64, Q65,
-  Q66, Q67, Q68, Q69,
-  Q70, Q71, Q72, Q73, Q74, Q75,
-  Q76, Q77, Q78, Q79,
-  Q80, Q81, Q82,
-  Q83, Q84, Q85, Q86,
-  Q87, Q88, Q89, Q90, Q91, Q90b, Q91b,
-  Q94, Q94b, Q97, Q97b, Q99, Q102, Q102b, Q103, Q104, Q106, Q107,
-  Q108, Q109, Q110, Q111, Q112,
-  ACC_IDENTIFIER,
-  ACC_DIM,
-  ACC_SNAP,
-  ACC_BIND,
-  ACC_WHEN,
-  ACC_KEYWORD,
-  ACC_INTEGER,
-  ACC_FLOAT,
-  ACC_STRING,
-  ACC_CHAR,
-  ACC_OPERATOR,
-  ACC_ASSIGN,
-  ACC_EXP,
-  ACC_FLOOR_DIV,
-  ACC_INC_DEC,
-  ACC_RELATIONAL,
-  ACC_LINK,
-  ACC_DELIMITER,
-  DISCARD_COMMENT,
-  ERR,
-} from './transitionTable.js';
+// character classes base sa Robert Sebesta Chapter 4
+export const CharClasses = Object.freeze({
+  LETTER:    'LETTER',
+  DIGIT:     'DIGIT',
+  OPERATOR:  'OPERATOR',
+  DELIMITER: 'DELIMITER',
+  QUOTE:     'QUOTE',
+  UNKNOWN:   'UNKNOWN',
+  EOF:       'EOF',
+});
 
-// icheck kung noise word, keyword, datatype, o ordinary identifier
-function classifyWord(word) {
-  if (NOISE_WORDS[word]) {
-    return createLexeme(Tokens.KEYWORD, NOISE_WORDS[word]);
-  }
-  if (KEYWORDS[word]) {
-    return createLexeme(Tokens.KEYWORD, word);
-  }
-  if (DATA_TYPES[word]) {
-    return createLexeme(Tokens.DATA_TYPE, word);
-  }
-  return createLexeme(Tokens.IDENTIFIER, word);
-}
+// LexicalAnalyzer class gamit ang Method 2 (Programmed State Transition Diagram)
+export class LexicalAnalyzer {
+  constructor(statement) {
+    this.input = statement || '';
+    this.length = this.input.length;
+    this.index = 0;
 
-// main lexer: nag-iiscan ng source code gamit DFA transition table
-export function analyze(statement) {
-  const lexemes = [];
-  if (!statement || statement.length === 0) {
-    return lexemes;
+    // Sebesta Chapter 4 state variables
+    this.nextChar = '';
+    this.charClass = CharClasses.EOF;
+    this.lexeme = '';
+
+    // line at column tracking
+    this.currentLine = 1;
+    this.currentCol = 1;
+    this.tokenStartLine = 1;
+    this.tokenStartCol = 1;
+
+    // Python-style indentation tracking
+    this.indentStack = [0];
+    this.atLineStart = true;
+    this.pendingTokens = [];
+
+    // unang tawag para ma-prime ang nextChar at charClass
+    this.getChar();
   }
 
-  // mag-append ng newline para mag-reduce nang maayos yung huling token sa EOF
-  let input = statement;
-  const lastChar = input.charAt(input.length - 1);
-  if (lastChar !== '\n') {
-    input += '\n';
-  }
+  // kumuha ng susunod na character at alamin ang character class nito
+  getChar() {
+    if (this.index < this.length) {
+      this.nextChar = this.input.charAt(this.index);
+      this.charLine = this.currentLine;
+      this.charCol = this.currentCol;
+      this.index++;
 
-  let currentState = Q0;
-  let buffer = '';
-  let index = 0;
-  const length = input.length;
-
-  while (index < length) {
-    const ch = input.charAt(index);
-    const column = getTableColumn(ch);
-    const nextState = transitionTable[currentState]
-      ? transitionTable[currentState][column]
-      : ERR;
-
-    switch (nextState) {
-      // whitespace lang, reset buffer
-      case Q0: {
-        buffer = '';
-        index++;
-        break;
-      }
-
-      // direct delimiter tokens
-      case Q94b:
-      case Q97:
-      case Q97b:
-      case Q99:
-      case Q102:
-      case Q102b:
-      case Q103:
-      case Q104:
-      case Q106:
-      case Q107: {
-        lexemes.push(createLexeme(Tokens.DELIMITER, ch));
-        buffer = '';
-        currentState = Q0;
-        index++;
-        break;
-      }
-
-      // comment loop
-      case Q87:
-      case Q88:
-      case Q89:
-      case Q90:
-      case Q91:
-      case Q90b:
-      case Q91b: {
-        buffer += ch;
-        currentState = nextState;
-        index++;
-        break;
-      }
-
-      // tapos na comment, discard buffer at wag mag-emit ng token
-      case DISCARD_COMMENT: {
-        buffer = '';
-        currentState = Q0;
-        index++;
-        break;
-      }
-
-      // scanning states, ipon lang ng char sa buffer
-      case Q1:
-      case Q2:
-      case Q3:
-      case Q4:
-      case Q5:
-      case Q6:
-      case Q7:
-      case Q8:
-      case Q9:
-      case Q10:
-      case Q11:
-      case Q12:
-      case Q13:
-      case Q14:
-      case Q15:
-      case Q16:
-      case Q17:
-      case Q18:
-      case Q19:
-      case Q19b:
-      case Q20:
-      case Q21:
-      case Q22:
-      case Q23:
-      case Q24:
-      case Q25:
-      case Q26:
-      case Q27:
-      case Q28:
-      case Q29:
-      case Q30:
-      case Q31:
-      case Q32:
-      case Q34:
-      case Q35:
-      case Q36:
-      case Q36_TERM:
-      case Q37:
-      case Q38:
-      case Q39:
-      case Q40:
-      case Q41:
-      case Q42:
-      case Q43:
-      case Q44:
-      case Q45:
-      case Q46:
-      case Q47:
-      case Q48:
-      case Q49:
-      case Q50:
-      case Q51:
-      case Q52:
-      case Q53:
-      case Q54:
-      case Q55:
-      case Q56:
-      case Q57:
-      case Q58:
-      case Q59:
-      case Q60:
-      case Q61:
-      case Q62:
-      case Q63:
-      case Q64:
-      case Q65:
-      case Q66:
-      case Q67:
-      case Q68:
-      case Q69:
-      case Q70:
-      case Q71:
-      case Q72:
-      case Q73:
-      case Q74:
-      case Q75:
-      case Q76:
-      case Q77:
-      case Q78:
-      case Q79:
-      case Q80:
-      case Q81:
-      case Q82:
-      case Q83:
-      case Q84:
-      case Q85:
-      case Q86:
-      case Q94:
-      case Q108:
-      case Q109:
-      case Q110:
-      case Q111:
-      case Q112: {
-        buffer += ch;
-        currentState = nextState;
-        index++;
-        break;
-      }
-
-      // reduce actions / emit tokens
-      case ACC_IDENTIFIER: {
-        const lexeme = classifyWord(buffer);
-        lexemes.push(lexeme);
-        buffer = '';
-        currentState = Q0;
-        // wag i-advance index para ma-process ulit yung current char sa Q0
-        break;
-      }
-
-      case ACC_DIM: {
-        lexemes.push(createLexeme(Tokens.KEYWORD, 'dim'));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_SNAP: {
-        lexemes.push(createLexeme(Tokens.KEYWORD, 'snap'));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_BIND: {
-        lexemes.push(createLexeme(Tokens.KEYWORD, 'bind'));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_WHEN: {
-        lexemes.push(createLexeme(Tokens.KEYWORD, 'when'));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_KEYWORD: {
-        lexemes.push(createLexeme(Tokens.KEYWORD, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_INTEGER: {
-        lexemes.push(createLexeme(Tokens.INTEGER_LIT, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_FLOAT: {
-        lexemes.push(createLexeme(Tokens.FLOAT_LIT, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_STRING: {
-        buffer += ch;
-        lexemes.push(createLexeme(Tokens.STRING_LIT, buffer));
-        buffer = '';
-        currentState = Q0;
-        index++;
-        break;
-      }
-
-      case ACC_CHAR: {
-        buffer += ch;
-        lexemes.push(createLexeme(Tokens.CHAR_LIT, buffer));
-        buffer = '';
-        currentState = Q0;
-        index++;
-        break;
-      }
-
-      case ACC_OPERATOR:
-      case ACC_EXP:
-      case ACC_FLOOR_DIV:
-      case ACC_INC_DEC: {
-        lexemes.push(createLexeme(Tokens.OPERATOR, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_ASSIGN: {
-        lexemes.push(createLexeme(Tokens.ASSIGN_OP, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_RELATIONAL: {
-        lexemes.push(createLexeme(Tokens.RELATIONAL_OP, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_LINK: {
-        lexemes.push(createLexeme(Tokens.LINK_OP, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      case ACC_DELIMITER: {
-        lexemes.push(createLexeme(Tokens.DELIMITER, buffer));
-        buffer = '';
-        currentState = Q0;
-        break;
-      }
-
-      // error handling pag unexpected char
-      case ERR:
-      default: {
-        if (buffer.length > 0) {
-          lexemes.push(createLexeme(Tokens.ERROR, buffer));
-          buffer = '';
+      // i-update ang line at col counter
+      if (this.nextChar === '\n') {
+        this.currentLine++;
+        this.currentCol = 1;
+      } else if (this.nextChar === '\r') {
+        if (this.index < this.length && this.input.charAt(this.index) === '\n') {
+          // hahayaan ang \n ang mag-increment
+        } else {
+          this.currentLine++;
+          this.currentCol = 1;
         }
-        if (ch !== ' ' && ch !== '\t' && ch !== '\n' && ch !== '\r') {
-          lexemes.push(createLexeme(Tokens.ERROR, ch));
+      } else if (this.nextChar === '\t') {
+        this.currentCol += 4;
+      } else {
+        this.currentCol++;
+      }
+
+      this.charClass = this.classifyChar(this.nextChar);
+    } else {
+      this.nextChar = '';
+      this.charClass = CharClasses.EOF;
+      this.charLine = this.currentLine;
+      this.charCol = this.currentCol;
+    }
+    return this.nextChar;
+  }
+
+  // tingnan ang susunod na char nang hindi ina-advance ang index
+  peekChar(offset = 0) {
+    const target = this.index + offset;
+    if (target < this.length) {
+      return this.input.charAt(target);
+    }
+    return '';
+  }
+
+  // ikategorya ang character sa Sebesta character class
+  classifyChar(ch) {
+    if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch === '_') {
+      return CharClasses.LETTER;
+    }
+    if (ch >= '0' && ch <= '9') {
+      return CharClasses.DIGIT;
+    }
+    if (ch === '"' || ch === "'") {
+      return CharClasses.QUOTE;
+    }
+    switch (ch) {
+      case '+':
+      case '-':
+      case '*':
+      case '/':
+      case '%':
+      case '=':
+      case '<':
+      case '>':
+      case '!':
+        return CharClasses.OPERATOR;
+      case '(':
+      case ')':
+      case '[':
+      case ']':
+      case '{':
+      case '}':
+      case ',':
+      case ':':
+      case ';':
+      case '.':
+      case '@':
+        return CharClasses.DELIMITER;
+      default:
+        return CharClasses.UNKNOWN;
+    }
+  }
+
+  // idugtong ang current char sa active lexeme buffer
+  addChar() {
+    this.lexeme += this.nextChar;
+  }
+
+  // sub-automaton para laktawan ang single-line at multi-line comments
+  skipComment() {
+    if (this.nextChar === '#') {
+      if (this.peekChar() === '*') {
+        // Multi-line comment: #* ... *#
+        this.getChar(); // consume '#'
+        this.getChar(); // consume '*'
+        while (this.charClass !== CharClasses.EOF) {
+          if (this.nextChar === '*' && this.peekChar() === '#') {
+            this.getChar(); // consume '*'
+            this.getChar(); // consume '#'
+            break;
+          }
+          this.getChar();
         }
-        currentState = Q0;
-        index++;
+      } else {
+        // Single-line comment: # hanggang newline
+        while (this.charClass !== CharClasses.EOF && this.nextChar !== '\n') {
+          this.getChar();
+        }
+      }
+    } else if (this.nextChar === '[' && this.peekChar() === '#') {
+      // Bracket multi-line comment: [# ... #]
+      this.getChar(); // consume '['
+      this.getChar(); // consume '#'
+      while (this.charClass !== CharClasses.EOF) {
+        if (this.nextChar === '#' && this.peekChar() === ']') {
+          this.getChar(); // consume '#'
+          this.getChar(); // consume ']'
+          break;
+        }
+        this.getChar();
+      }
+    }
+  }
+
+  // sub-automaton para sa block scoping indentation sa simula ng bagong linya
+  handleLineIndentation() {
+    while (this.atLineStart && this.charClass !== CharClasses.EOF) {
+      let indentCount = 0;
+
+      // bilangin ang leading spaces at tabs
+      while (this.charClass !== CharClasses.EOF && (this.nextChar === ' ' || this.nextChar === '\t')) {
+        if (this.nextChar === ' ') indentCount++;
+        else if (this.nextChar === '\t') indentCount += 4;
+        this.getChar();
+      }
+
+      // blank line: laktawan lang at manatiling atLineStart
+      if (this.nextChar === '\n' || this.nextChar === '\r') {
+        if (this.nextChar === '\r' && this.peekChar() === '\n') {
+          this.getChar();
+        }
+        this.getChar();
+        this.atLineStart = true;
+        continue;
+      }
+
+      // comment-only line: i-skip ang comment at manatiling atLineStart
+      if (this.nextChar === '#' || (this.nextChar === '[' && this.peekChar() === '#')) {
+        this.skipComment();
+        if (this.nextChar === '\n' || this.nextChar === '\r') {
+          if (this.nextChar === '\r' && this.peekChar() === '\n') {
+            this.getChar();
+          }
+          this.getChar();
+        }
+        this.atLineStart = true;
+        continue;
+      }
+
+      if (this.charClass === CharClasses.EOF) {
+        this.atLineStart = false;
+        break;
+      }
+
+      // may code token sa linyang ito: i-compare ang indent sa stack
+      const topIndent = this.indentStack[this.indentStack.length - 1];
+      if (indentCount > topIndent) {
+        this.indentStack.push(indentCount);
+        this.pendingTokens.push(createLexeme(Tokens.INDENT, 'INDENT', this.charLine, 1));
+      } else if (indentCount < topIndent) {
+        while (this.indentStack.length > 1 && this.indentStack[this.indentStack.length - 1] > indentCount) {
+          this.indentStack.pop();
+          this.pendingTokens.push(createLexeme(Tokens.DEDENT, 'DEDENT', this.charLine, 1));
+        }
+      }
+
+      this.atLineStart = false;
+      break;
+    }
+  }
+
+  // laktawan ang non-significant whitespaces at comments sa pagitan ng mga tokens
+  getNonBlank() {
+    while (this.charClass !== CharClasses.EOF) {
+      if (this.nextChar === ' ' || this.nextChar === '\t') {
+        this.getChar();
+      } else if (this.nextChar === '\n' || this.nextChar === '\r') {
+        this.atLineStart = true;
+        this.getChar();
+        this.handleLineIndentation();
+        if (this.pendingTokens.length > 0) {
+          break;
+        }
+      } else if (this.nextChar === '#' || (this.nextChar === '[' && this.peekChar() === '#')) {
+        this.skipComment();
+      } else {
         break;
       }
     }
+  }
+
+  // sub-automaton para sa identifiers, keywords, datatypes, at noise words
+  identifierAutomaton() {
+    this.addChar();
+    this.getChar();
+
+    while (this.charClass === CharClasses.LETTER || this.charClass === CharClasses.DIGIT) {
+      this.addChar();
+      this.getChar();
+    }
+
+    const word = this.lexeme;
+    let tokenType = Tokens.IDENTIFIER;
+    let value = word;
+
+    // O(1) keyword at noise word reduction lookup
+    if (NOISE_WORDS[word]) {
+      tokenType = Tokens.KEYWORD;
+      value = NOISE_WORDS[word];
+    } else if (KEYWORDS[word]) {
+      tokenType = Tokens.KEYWORD;
+    } else if (DATA_TYPES[word]) {
+      tokenType = Tokens.DATA_TYPE;
+    }
+
+    return createLexeme(tokenType, value, this.tokenStartLine, this.tokenStartCol);
+  }
+
+  // sub-automaton para sa numeric literals (integers, floats, at scientific notation)
+  numberAutomaton() {
+    this.addChar();
+    this.getChar();
+
+    while (this.charClass === CharClasses.DIGIT) {
+      this.addChar();
+      this.getChar();
+    }
+
+    let isFloat = false;
+
+    // Fractional part: Trailing dot check
+    if (this.nextChar === '.') {
+      const charAfterDot = this.peekChar();
+      if (charAfterDot >= '0' && charAfterDot <= '9') {
+        isFloat = true;
+        this.addChar(); // consume '.'
+        this.getChar();
+        while (this.charClass === CharClasses.DIGIT) {
+          this.addChar();
+          this.getChar();
+        }
+      } else {
+        // Dot na hindi sinundan ng digit (e.g. 10.weight):
+        // Wag i-consume ang '.' para ma-evaluate ito bilang DELIMITER sa susunod na tawag
+        return createLexeme(Tokens.INTEGER_LIT, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+    }
+
+    // Scientific notation: e o E na may optional + o - at kahit isang digit (e.g. 1e-5, 2.5e3, 10E+2)
+    if (this.nextChar === 'e' || this.nextChar === 'E') {
+      let nextC = this.peekChar(0);
+      if (nextC === '+' || nextC === '-') {
+        nextC = this.peekChar(1);
+      }
+
+      if (nextC >= '0' && nextC <= '9') {
+        // Valid scientific notation exponent
+        isFloat = true;
+        this.addChar(); // consume 'e' o 'E'
+        this.getChar();
+
+        if (this.nextChar === '+' || this.nextChar === '-') {
+          this.addChar(); // consume sign
+          this.getChar();
+        }
+
+        while (this.charClass === CharClasses.DIGIT) {
+          this.addChar();
+          this.getChar();
+        }
+      }
+      // Kung hindi sinusundan ng sign/digit (e.g. 10emit), wag galawin ang 'e'
+    }
+
+    return createLexeme(
+      isFloat ? Tokens.FLOAT_LIT : Tokens.INTEGER_LIT,
+      this.lexeme,
+      this.tokenStartLine,
+      this.tokenStartCol
+    );
+  }
+
+  // sub-automaton para sa string at char literals na may escape sequences at triple-quote support
+  stringAutomaton() {
+    const quoteChar = this.nextChar;
+    const isSingleQuote = quoteChar === "'";
+
+    // Check para sa triple quotes: """ o '''
+    const isTriple =
+      this.peekChar(0) === quoteChar && this.peekChar(1) === quoteChar;
+
+    let isClosed = false;
+
+    if (isTriple) {
+      // Consume 3 opening quotes
+      this.addChar(); this.getChar();
+      this.addChar(); this.getChar();
+      this.addChar(); this.getChar();
+
+      while (this.charClass !== CharClasses.EOF) {
+        if (this.nextChar === '\\') {
+          // Escape sequence sa loob ng triple quotes
+          this.addChar();
+          this.getChar();
+          if (this.charClass !== CharClasses.EOF) {
+            this.addChar();
+            this.getChar();
+          }
+        } else if (
+          this.nextChar === quoteChar &&
+          this.peekChar(0) === quoteChar &&
+          this.peekChar(1) === quoteChar
+        ) {
+          // Natagpuan ang 3 closing quotes
+          this.addChar(); this.getChar();
+          this.addChar(); this.getChar();
+          this.addChar(); this.getChar();
+          isClosed = true;
+          break;
+        } else {
+          // Maaaring tumawid sa newlines ang triple quotes
+          this.addChar();
+          this.getChar();
+        }
+      }
+    } else {
+      // Standard single-line string ("...") o char literal ('...')
+      this.addChar();
+      this.getChar();
+
+      while (this.charClass !== CharClasses.EOF) {
+        if (this.nextChar === '\\') {
+          this.addChar();
+          this.getChar();
+          if (this.charClass !== CharClasses.EOF) {
+            this.addChar();
+            this.getChar();
+          }
+        } else if (this.nextChar === quoteChar) {
+          this.addChar();
+          this.getChar();
+          isClosed = true;
+          break;
+        } else if (this.nextChar === '\n' || this.nextChar === '\r') {
+          // Error kapag may raw unescaped newline sa loob ng single-line literal
+          break;
+        } else {
+          this.addChar();
+          this.getChar();
+        }
+      }
+    }
+
+    if (!isClosed) {
+      return createLexeme(Tokens.ERROR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+    }
+
+    return createLexeme(
+      isSingleQuote && !isTriple ? Tokens.CHAR_LIT : Tokens.STRING_LIT,
+      this.lexeme,
+      this.tokenStartLine,
+      this.tokenStartCol
+    );
+  }
+
+  // sub-automaton para sa operators at delimiters gamit ang deterministic lookahead
+  lookup(ch) {
+    switch (ch) {
+      // arithmetic at compound operators
+      case '+': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '+') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '-': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '-') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '*': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '*') {
+          this.addChar();
+          this.getChar();
+          if (this.nextChar === '=') {
+            this.addChar();
+            this.getChar();
+            return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+          }
+          return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '/': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '/') {
+          this.addChar();
+          this.getChar();
+          if (this.nextChar === '=') {
+            this.addChar();
+            this.getChar();
+            return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+          }
+          return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '%': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '=': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        if (this.nextChar === '>') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.LINK_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.ASSIGN_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '<': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          if (this.nextChar === '>') {
+            this.addChar();
+            this.getChar();
+            return createLexeme(Tokens.LINK_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+          }
+          return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '>': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      case '!': {
+        this.addChar();
+        this.getChar();
+        if (this.nextChar === '=') {
+          this.addChar();
+          this.getChar();
+          return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        }
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      // standard delimiters
+      case '[':
+        if (this.peekChar() === '#') {
+          this.skipComment();
+          return this.lex();
+        }
+        // falls through sa unified delimiter block
+      case '(':
+      case ')':
+      case '{':
+      case '}':
+      case ']':
+      case ',':
+      case ':':
+      case ';':
+      case '.':
+      case '@': {
+        this.addChar();
+        this.getChar();
+        return createLexeme(Tokens.DELIMITER, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      default: {
+        this.addChar();
+        this.getChar();
+        return createLexeme(Tokens.ERROR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+    }
+  }
+
+  // main lex() routine mula sa Robert Sebesta Chapter 4
+  lex() {
+    // kung may nakapilang INDENT o DEDENT tokens, ilabas muna ang mga ito
+    if (this.pendingTokens.length > 0) {
+      return this.pendingTokens.shift();
+    }
+
+    if (this.atLineStart) {
+      this.handleLineIndentation();
+      if (this.pendingTokens.length > 0) {
+        return this.pendingTokens.shift();
+      }
+    }
+
+    this.getNonBlank();
+
+    if (this.pendingTokens.length > 0) {
+      return this.pendingTokens.shift();
+    }
+
+    // EOF handling: i-flush ang anumang unclosed indentation levels
+    if (this.charClass === CharClasses.EOF) {
+      if (this.indentStack.length > 1) {
+        this.indentStack.pop();
+        return createLexeme(Tokens.DEDENT, 'DEDENT', this.currentLine, 1);
+      }
+      return null;
+    }
+
+    this.lexeme = '';
+    this.tokenStartLine = this.charLine;
+    this.tokenStartCol = this.charCol;
+
+    // Dispatch sa nararapat na sub-automaton base sa Sebesta character class
+    switch (this.charClass) {
+      case CharClasses.LETTER:
+        return this.identifierAutomaton();
+
+      case CharClasses.DIGIT:
+        return this.numberAutomaton();
+
+      case CharClasses.QUOTE:
+        return this.stringAutomaton();
+
+      case CharClasses.OPERATOR:
+      case CharClasses.DELIMITER:
+        return this.lookup(this.nextChar);
+
+      case CharClasses.UNKNOWN:
+      default:
+        return this.lookup(this.nextChar);
+    }
+  }
+}
+
+// main analyze() driver function
+export function analyze(statement) {
+  if (!statement || statement.length === 0) {
+    return [];
+  }
+
+  const lexer = new LexicalAnalyzer(statement);
+  const lexemes = [];
+  let token = lexer.lex();
+
+  while (token !== null) {
+    lexemes.push(token);
+    token = lexer.lex();
   }
 
   return lexemes;

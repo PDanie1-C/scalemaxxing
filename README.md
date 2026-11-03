@@ -6,7 +6,7 @@
 
 ```
 scalemaxxing/
-├─ lexer/          # Compiler logic (analyzer.js, tokens.js, transitionTable.js)
+├─ lexer/          # Compiler logic (analyzer.js, tokens.js)
 ├─ frontend/       # Vite + React user interface 
 ├─ tests/          # Unit tests for the lexer outputs
 ├─ .gitignore
@@ -20,7 +20,7 @@ scalemaxxing/
 
 ## Test Files
 
-The `tests/` directory contains 5 `.txt` files designed for manual verification via the **Upload .txt** button in the UI.
+The `tests/` directory contains 6 `.txt` files designed for manual verification via the **Upload .txt** button in the UI.
 
 ## Running the Frontend
 
