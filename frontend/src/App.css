@@ -1,0 +1,51 @@
+/* ─── Global Styles for ScaleMAXXING Lexical Analyzer ─── */
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #161615;
+  color: #ecebe6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #7aa2ff40;
+}
+
+textarea:focus {
+  border-color: #7aa2ff !important;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a36;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

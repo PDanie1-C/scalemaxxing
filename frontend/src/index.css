@@ -1,0 +1,12 @@
+/* ─── Reset and Base ─── */
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #161615;
+  color: #ecebe6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}

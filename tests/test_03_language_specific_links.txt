@@ -1,0 +1,21 @@
+# Test 03: Language-Specific Links and Reactive Constructs
+# Bidirectional constraint binding
+bind area <=> length * width
+bind momentum <=> mass * velocity
+
+# Weight priority assignments for two-way constraints
+length.weight = 0.6
+width.weight = 0.4
+
+# One-way reactive data flow linking
+flow velocity => distance / duration
+flow kineticEnergy => 0.5 * mass * (velocity * velocity)
+
+# Snapshot capture breaking algebraic link
+pure savedPosition = snap(coordinates)
+pure staticArea = snap(area)
+
+# Manual compiler synchronization trigger
+emit(area)
+emit(velocity)
+

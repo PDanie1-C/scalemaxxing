@@ -1,0 +1,17 @@
+# Test 01: Declarations and Units
+dim distance = 100 [m]
+dim duration = 12.2 [s]
+dim mass velocity: [m/s] = 25.0
+
+# Multiple variable declarations on a single line separated by commas
+dim width = 10.0 [m], height = 5.0 [m], mass = 45.0 [kg]
+pure multiplier = 1.5, scaleFactor = 2.0, limit = 100
+
+# Custom unit definition
+unit Force = kg * m / (s * s);
+unit Velocity = m / s;
+
+# Pure scalar variable declarations without physical units
+pure PI = 3.14159265;
+pure offset = 0.5;
+

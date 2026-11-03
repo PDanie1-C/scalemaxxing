@@ -1,0 +1,29 @@
+# Test 02: Operators and Maximal Munch
+# Augmented arithmetic assignments
+x += 10
+y -= 5
+velocity *= 2
+duration /= 3
+remainder %= 4
+power **= 3
+floorVal //= 2
+
+# Postfix and prefix increment / decrement operators
+counter++
+++counter
+pointer--
+--pointer
+
+# Relational and comparison operators
+snap (speed >= 100):
+    weight "Speed limit exceeded"
+
+snap (temperature <= 0):
+    weight "Freezing point"
+
+snap (currentAltitude == targetAltitude):
+    weight "Target reached"
+
+snap (status != 0):
+    weight "Error state"
+

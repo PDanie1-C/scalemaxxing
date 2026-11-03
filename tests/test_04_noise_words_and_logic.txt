@@ -1,0 +1,19 @@
+# Test 04: Noise Words and Logic
+# Noise word reduction: dimension -> dim
+dimension mass altitude = 1200 [m]
+dimension span pressure = 101.325
+
+# Noise word reduction: binding -> bind
+binding totalPower <=> voltage * current
+
+# Noise word reduction: whenever -> when, snapshot -> snap
+whenever (pressure > 100 and not flag or altitude <= 500):
+    halt {
+        currentReading = snapshot(altitude);
+        emit(currentReading);
+    }
+
+# Logical operator chaining and structural delimiters
+snap (sensorA and sensorB or not systemReady):
+    weight "Logic branch evaluated"
+
