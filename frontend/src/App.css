@@ -1,4 +1,4 @@
-/* ─── Global Styles for ScaleMAXXING Lexical Analyzer ─── */
+/* ─── Global Styles ─── */
 
 :root {
   color-scheme: dark;
@@ -11,7 +11,11 @@
 }
 
 body {
-  background: #161615;
+  background: linear-gradient(
+    135deg,
+    #363592 0%,
+    #000000 100%
+  );
   color: #ecebe6;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 15px;

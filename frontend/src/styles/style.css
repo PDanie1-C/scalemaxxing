@@ -1,0 +1,28 @@
+body {
+  background: linear-gradient(
+    135deg,
+    #363592 0%,
+    #000000 100%
+  );
+  color: #ecebe6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container-flex {
+  display: flex;
+  gap: 3rem;
+}
+
+.container-flex > *:first-child {
+  flex-basis: 50%;
+  flex-shrink: 0;
+
+}
+
+.container-flex > *:nth-child(2) {
+  flex-basis: 50%;
+  flex-shrink: 1;
+}
