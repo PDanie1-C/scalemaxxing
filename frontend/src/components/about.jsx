@@ -1,3 +1,6 @@
+import '../styles/style.css';
+import styles from '../styles/inlineStyles'
+
 function About({ onBack }) {
 	return (
 		<div>
