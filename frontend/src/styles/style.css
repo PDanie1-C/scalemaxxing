@@ -16,6 +16,11 @@ body {
   gap: 3rem;
 }
 
+.header-group {
+    justify-content: space-between;
+    align-items: center;
+}
+
 .container-flex > *:first-child {
   flex-basis: 50%;
   flex-shrink: 0;
@@ -25,4 +30,37 @@ body {
 .container-flex > *:nth-child(2) {
   flex-basis: 50%;
   flex-shrink: 1;
+}
+
+.right-settings {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+button {
+    padding: 8px 14px;
+    border: 1px solid #3a3a36;
+    border-radius: 8px;
+    background: #21211f;
+    color: #ecebe6;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px,
+}
+
+.container-button {
+    background: #21211f;
+    border-radius: 8px;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+
+    > * {
+        border-radius: 0;
+        border: none;
+    }
 }
