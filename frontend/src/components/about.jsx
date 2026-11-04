@@ -19,12 +19,13 @@ function About({ onBack }) {
 
 					<h1 className="brand">ScaleMAXXING</h1>
 					<p className="description">
-						Lorem ipsum dolor sit amet consectetur adipiscing elit cillum nulla amet,
-						eiusmod anim at. Ut adipiscing laboris at id eiusmod eiusmod ad sint ipsum
-						occaecat veniam deserunt aliquip. Exercitation justo cupidatat reprehenderit
-						occaecat excepteur occaecat ex. Irure id nisi veniam, velit qui odio
-						reprehenderit cupidatat et adipiscing ex labore. Do enim fugiat anim
-						proident minim. Mollit velit at ea consequat accusamus.
+						ScaleMAXXING is a unit-aware programming language that ensures physical 
+						units like meters, seconds and kilograms are checked at compile time. 
+						It also employs bidirectional constraint links, so that corresponding 
+						variables update automatically, just like spreadsheet cells. This lexical 
+						analyzer takes in ScaleMAXXING source code and segments it into tokens 
+						(identifiers, keywords, operators, literals, and symbols), and it returns 
+						to print any sequence which does not comply with the rules of the language.
 					</p>
         </div>
 
