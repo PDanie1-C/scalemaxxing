@@ -13,7 +13,8 @@
 body {
   background: linear-gradient(
     135deg,
-    #363592 0%,
+    #000000 25%,
+    #363592 50%,
     #000000 100%
   );
   color: #ecebe6;

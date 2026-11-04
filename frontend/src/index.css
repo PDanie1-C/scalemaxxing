@@ -3,6 +3,9 @@
 
 :root {
   color-scheme: dark;
+
+  --btn-clr: #5c5b9b;
+  --btn-clr-accent: #ec8239;
 }
 
 *, 
