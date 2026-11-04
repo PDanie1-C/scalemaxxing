@@ -6,7 +6,6 @@ export const Tokens = Object.freeze({
   INTEGER_LIT:   'INTEGER_LIT',
   FLOAT_LIT:     'FLOAT_LIT',
   STRING_LIT:    'STRING_LIT',
-  CHAR_LIT:      'CHAR_LIT',
   OPERATOR:      'OPERATOR',
   ASSIGN_OP:     'ASSIGN_OP',
   RELATIONAL_OP: 'RELATIONAL_OP',

@@ -339,7 +339,6 @@ export class LexicalAnalyzer {
   // sub-automaton para sa string at char literals na may escape sequences at triple-quote support
   stringAutomaton() {
     const quoteChar = this.nextChar;
-    const isSingleQuote = quoteChar === "'";
 
     // Check para sa triple quotes: """ o '''
     const isTriple =
