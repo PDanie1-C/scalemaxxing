@@ -3,11 +3,15 @@ import { analyze } from '@lexer/analyzer.js';
 import { Tokens } from '@lexer/tokens.js';
 import '../styles/style.css';
 import styles from '../styles/inlineStyles';
+import '../styles/fonts.css';
 
 import CodeEditor from './CodeEditor';
 import TokenBreakdown from './tokenBreakdown';
 import ResultsTable from './resultsTable';
 import PlaintextOutput from './plaintextOutput';
+
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import logo from '../assets/logo.svg';
 
 // kulay ng bawat token sa table at badges
 function getTokenColor(token) {
@@ -70,7 +74,7 @@ function getTokenCategory(token) {
   }
 }
 
-export default function LexerInterface() {
+export default function LexerInterface({onAbout}) {
   const [sourceCode, setSourceCode] = useState('');
   const [lexemes, setLexemes] = useState([]);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
@@ -197,59 +201,77 @@ export default function LexerInterface() {
   }, [sourceCode]);
 
   return (
-    <div style={styles.page}>
+    <div style={styles.page} className='lexer-page'>
       {/* Header */}
-      <header style={styles.header}>
-        <h1 style={styles.title}>ScaleMAXXING</h1>
-        <p style={styles.subtitle}>a unit-aware language by PPL - Group 4</p>
-      </header>
+      <div className='container-flex header-group'>
+        <header style={styles.header} className='header-flex'>
+          <div><img className='logo' src={logo} alt="Logo"/></div>
+          <div>
+            <h1 style={styles.title} className='title'>ScaleMAXXING</h1>
+            <p style={styles.subtitle}>A unit-aware language by PPL - Group 4</p>
+          </div>
+        </header>
 
-      {/* Code Editor na may Sticky Synchronized Line Gutter */}
-      <CodeEditor 
-        gutterRef={gutterRef} 
-        lineCount={lineCount}
-        textareaRef={textareaRef}
-        sourceCode={sourceCode}
-        handleInputChange={handleInputChange}
-        handleScroll={handleScroll}
-        handleKeyDown={handleKeyDown}
-        handleAnalyze={handleAnalyze}
-        handleFileUpload={handleFileUpload}
-        handleClear={handleClear}
-        isAnalyzed={isAnalyzed}
-        stats={stats}
-      />
+        <div className='right-settings'>
+          <button onClick={onAbout}>About Us</button>
+          <div className='header-group container-button'>
+            <button><MdLightMode/></button>
+            <button><MdDarkMode/></button>
+          </div>
+        </div>
+      </div>
+      
 
-      {/* Token Statistics Badges at Real-Time Filter Pills */}
-      <TokenBreakdown
-        isAnalyzed={isAnalyzed}
-        lexemes={lexemes}
-        stats={stats}
-        setSelectedFilter={setSelectedFilter}
-        selectedFilter={selectedFilter}
-      />
+      <div className="container-flex main-container"> 
+        {/* Code Editor na may Sticky Synchronized Line Gutter */}
+        <CodeEditor 
+          gutterRef={gutterRef} 
+          lineCount={lineCount}
+          textareaRef={textareaRef}
+          sourceCode={sourceCode}
+          handleInputChange={handleInputChange}
+          handleScroll={handleScroll}
+          handleKeyDown={handleKeyDown}
+          handleAnalyze={handleAnalyze}
+          handleFileUpload={handleFileUpload}
+          handleClear={handleClear}
+          isAnalyzed={isAnalyzed}
+          stats={stats}
+        />
+        
+        <div>
+          {/* Token Statistics Badges at Real-Time Filter Pills */}
+          <TokenBreakdown
+            isAnalyzed={isAnalyzed}
+            lexemes={lexemes}
+            stats={stats}
+            setSelectedFilter={setSelectedFilter}
+            selectedFilter={selectedFilter}
+          />
 
-      {/* Results Table Area */}
-      <ResultsTable
-        isAnalyzed={isAnalyzed}
-        sourceCode={sourceCode}
-        handleAnalyze={handleAnalyze}
-        lexemes={lexemes}
-        filteredLexemes={filteredLexemes}
-        selectedFilter={selectedFilter}
-        getTokenColor={getTokenColor}
-        getTokenCategory={getTokenCategory}
-      />
+          {/* Results Table Area */}
+          <ResultsTable
+            isAnalyzed={isAnalyzed}
+            sourceCode={sourceCode}
+            handleAnalyze={handleAnalyze}
+            lexemes={lexemes}
+            filteredLexemes={filteredLexemes}
+            selectedFilter={selectedFilter}
+            getTokenColor={getTokenColor}
+            getTokenCategory={getTokenCategory}
+          />
 
-      {/* Plain Text Output Drawer */}
-      <PlaintextOutput
-        isAnalyzed={isAnalyzed}
-        lexemes={lexemes}
-        filteredLexemes={filteredLexemes}
-        selectedFilter={selectedFilter}
-        handleCopy={handleCopy}
-        copyMessage={copyMessage}
-      />
+          {/* Plain Text Output Drawer */}
+          <PlaintextOutput
+            isAnalyzed={isAnalyzed}
+            lexemes={lexemes}
+            filteredLexemes={filteredLexemes}
+            selectedFilter={selectedFilter}
+            handleCopy={handleCopy}
+            copyMessage={copyMessage}
+          />
+        </div>
+      </div>
     </div>
   );
 }

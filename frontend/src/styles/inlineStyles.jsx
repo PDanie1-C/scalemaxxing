@@ -1,8 +1,9 @@
+import '../styles/fonts.css';
+
 const styles = {
   page: {
     maxWidth: '100vw',
     margin: '0 auto',
-    padding: '28px 20px 56px',
     fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
     color: '#ecebe6',
     minHeight: '100vh',
@@ -11,16 +12,18 @@ const styles = {
     marginBottom: '20px',
   },
   title: {
-    margin: '0 0 4px',
-    fontSize: '28px',
+    fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
     fontWeight: 700,
     color: '#ecebe6',
-    letterSpacing: '-0.5px',
+    letterSpacing: '1px',
+    fontFamily: "'norwester', sans-serif"
   },
+
   subtitle: {
     margin: '0',
     color: '#9a9890',
   },
+
   editorContainer: {
     display: 'flex',
     minHeight: '220px',
@@ -31,6 +34,7 @@ const styles = {
     overflow: 'hidden',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
   },
+  
   gutter: {
     padding: '14px 10px',
     background: '#191917',
@@ -48,20 +52,21 @@ const styles = {
   gutterLine: {
     height: '20.8px',
   },
+
   textarea: {
     flex: 1,
-    minHeight: '220px',
-    maxHeight: '480px',
-    padding: '14px',
+    width: '100%',
+    minHeight: '15rem',
+    maxHeight: '30rem',
+    padding: '1rem',
     border: 'none',
     outline: 'none',
     background: 'transparent',
     color: '#ecebe6',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
-    fontSize: '13px',
+    fontSize: '0.9rem',
     lineHeight: '1.6',
     resize: 'none',
-    boxSizing: 'border-box',
     whiteSpace: 'pre',
     overflow: 'auto',
   },
@@ -88,14 +93,14 @@ const styles = {
     transition: 'background 0.15s, border-color 0.15s',
   },
   buttonPrimary: {
-    background: '#7aa2ff',
-    borderColor: '#7aa2ff',
+    background: 'var(--btn-clr-accent)',
+    borderColor: 'var(--btn-clr-accent)',
     color: '#0c1017',
     fontWeight: 600,
   },
   statusIndicator: {
     marginLeft: 'auto',
-    fontSize: '13px',
+    fontSize: '0.9rem',
   },
   pendingBadge: {
     color: '#ffb072',
@@ -169,9 +174,8 @@ const styles = {
     border: '1px solid #3a3a36',
     borderRadius: '10px',
     background: '#21211f',
-    overflow: 'hidden',
-    'overflow-x': 'auto',
-    '-webkit-overflow-scrolling': 'touch'
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch'
   },
   emptyState: {
     padding: '44px 20px',
@@ -196,7 +200,6 @@ const styles = {
   },
   table: {
     width: '100%',
-    tableLayout: 'fixed',
     borderCollapse: 'collapse',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '13px',

@@ -3,7 +3,7 @@ import styles from '../styles/inlineStyles';
 
 function CodeEditor ({gutterRef, lineCount, textareaRef, sourceCode, handleInputChange, handleScroll, handleKeyDown, handleAnalyze, handleFileUpload, handleClear, isAnalyzed, stats }) {
 	return (
-		<>
+		<div>
 			<div style={styles.editorContainer}>
         <div ref={gutterRef} style={styles.gutter}>
           {Array.from({ length: lineCount }, (_, i) => (
@@ -54,7 +54,7 @@ function CodeEditor ({gutterRef, lineCount, textareaRef, sourceCode, handleInput
           )}
         </span>
       </div>
-		</>
+		</div>
 	)
 }
 
