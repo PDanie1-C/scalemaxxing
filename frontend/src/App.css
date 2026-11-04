@@ -15,7 +15,7 @@ body {
     135deg,
     var(--bgr-clr) 25%,
     var(--bgr-clr-accent) 50%,
-    var(--bgr-clr) 100%
+    var(--bgr-clr) 75%
   );
   color: #ecebe6;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
