@@ -13,9 +13,9 @@
 body {
   background: linear-gradient(
     135deg,
-    #000000 25%,
-    #363592 50%,
-    #000000 100%
+    var(--bgr-clr) 25%,
+    var(--bgr-clr-accent) 50%,
+    var(--bgr-clr) 100%
   );
   color: #ecebe6;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;

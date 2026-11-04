@@ -37,6 +37,7 @@ function About({ onBack }) {
 						key={contributor.id}
 						name={contributor.name}
 						image={contributor.image}
+						role={contributor.role}
 					/>
 				))}
 			</main>
