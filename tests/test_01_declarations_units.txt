@@ -15,3 +15,10 @@ unit Velocity = m / s;
 pure PI = 3.14159265;
 pure offset = 0.5;
 
+# Scientific notation literals with dimensional units
+dim span wavelength = 1.5e-6 [m]
+pure speedOfLight = 3e8 [m/s]
+pure planckConstant = 6.626e-34
+dim mass microMass = 1.5e-6 [kg]
+pure largeScale = 1.25E+5
+
