@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { analyze } from '@lexer/analyzer.js';
 import { Tokens } from '@lexer/tokens.js';
+import '../styles/style.css';
 
 // default code sa editor
 const SAMPLE_CODE = `# variable declarations
@@ -149,96 +150,106 @@ export default function LexerInterface() {
     <div style={styles.page}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>ScaleMAXXING</h1>
-        <p style={styles.subtitle}>DFA-Based Lexical Analyzer</p>
+        <h1 style={styles.title} class="shrikhand-title">ScaleMAXXING</h1>
+        <p style={styles.subtitle}>a unit-aware language by PPL - Group 4</p>
       </header>
 
       {/* Source Input */}
-      <textarea
-        value={sourceCode}
-        onChange={handleInputChange}
-        placeholder="Enter ScaleMAXXING code here..."
-        spellCheck={false}
-        style={styles.textarea}
-      />
-
-      {/* Toolbar */}
-      <div style={styles.toolbar}>
-        <button onClick={handleAnalyze} style={{ ...styles.button, ...styles.buttonPrimary }}>
-          Analyze
-        </button>
-        <label style={styles.button}>
-          Upload .txt
-          <input
-            type="file"
-            accept=".txt,.smx"
-            onChange={handleFileUpload}
-            style={{ display: 'none' }}
+      <div class="container-flex">
+        <div>
+          <textarea
+            value={sourceCode}
+            onChange={handleInputChange}
+            placeholder="Enter ScaleMAXXING code here..."
+            spellCheck={false}
+            style={styles.textarea}
           />
-        </label>
-        <button onClick={handleClear} style={styles.button}>
-          Clear
-        </button>
-        <span style={styles.stats}>
-          {totalTokens > 0 && `${totalTokens} token${totalTokens !== 1 ? 's' : ''}${errorCount > 0 ? `, ${errorCount} error${errorCount !== 1 ? 's' : ''}` : ''}`}
-        </span>
-      </div>
 
-      {/* Results Table */}
-      <div style={styles.resultsContainer}>
-        {lexemes.length === 0 ? (
-          <p style={styles.muted}>No tokens yet. Enter ScaleMAXXING code above.</p>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={{ ...styles.th, width: '50px' }}>#</th>
-                <th style={styles.th}>Lexeme</th>
-                <th style={styles.th}>Token</th>
-                <th style={styles.th}>Category</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lexemes.map((lex, i) => (
-                <tr key={i} style={i % 2 === 0 ? styles.trEven : styles.trOdd}>
-                  <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{i + 1}</td>
-                  <td style={{ ...styles.td, ...styles.lexemeCell }}>
-                    {lex.value}
-                  </td>
-                  <td style={{ ...styles.td, color: getTokenColor(lex.token) }}>
-                    {lex.token}
-                  </td>
-                  <td style={{ ...styles.td, ...styles.categoryCell }}>
-                    <span style={{
-                      ...styles.badge,
-                      backgroundColor: getTokenColor(lex.token) + '20',
-                      color: getTokenColor(lex.token),
-                    }}>
-                      {getTokenCategory(lex.token)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Plain Text Output */}
-      {lexemes.length > 0 && (
-        <details style={styles.details}>
-          <summary style={styles.summary}>Plain Text Output</summary>
-          <div style={styles.plainActions}>
-            <button onClick={handleCopy} style={styles.button}>
-              Copy
+          {/* Toolbar */}
+          <div style={styles.toolbar}>
+            <button onClick={handleAnalyze} style={{ ...styles.button, ...styles.buttonPrimary }}>
+              Analyze
             </button>
-            {copyMessage && <span style={styles.copyMsg}>{copyMessage}</span>}
+            <label style={styles.button}>
+              Upload .txt
+              <input
+                type="file"
+                accept=".txt,.smx"
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+              />
+            </label>
+            <button onClick={handleClear} style={styles.button}>
+              Clear
+            </button>
+            <span style={styles.stats}>
+              {totalTokens > 0 && `${totalTokens} token${totalTokens !== 1 ? 's' : ''}${errorCount > 0 ? `, ${errorCount} error${errorCount !== 1 ? 's' : ''}` : ''}`}
+            </span>
           </div>
-          <pre style={styles.pre}>
-            {lexemes.map((lex) => `${lex.value.padEnd(25)} : ${lex.token}`).join('\n')}
-          </pre>
-        </details>
-      )}
+        </div>
+        
+        {/* Results Table */}
+        <div>
+          <div style={styles.resultsContainer}>
+            {lexemes.length === 0 ? (
+              <p style={styles.muted}>No tokens yet. Enter ScaleMAXXING code above.</p>
+            ) : (
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, width: '50px' }}>#</th>
+                    <th style={styles.th}>Line</th>
+                    <th style={styles.th}>Col</th>
+                    <th style={styles.th}>Lexeme</th>
+                    <th style={styles.th}>Token</th>
+                    <th style={styles.th}>Category</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lexemes.map((lex, i) => (
+                    <tr key={i} style={i % 2 === 0 ? styles.trEven : styles.trOdd}>
+                      <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{i + 1}</td>
+                      <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{lex.line}</td>
+                      <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{lex.col}</td>
+                      <td style={{ ...styles.td, ...styles.lexemeCell }}>
+                        {lex.value}
+                      </td>
+                      <td style={{ ...styles.td, color: getTokenColor(lex.token) }}>
+                        {lex.token}
+                      </td>
+                      <td style={{ ...styles.td, ...styles.categoryCell }}>
+                        <span style={{
+                          ...styles.badge,
+                          backgroundColor: getTokenColor(lex.token) + '20',
+                          color: getTokenColor(lex.token),
+                        }}>
+                          {getTokenCategory(lex.token)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Plain Text Output */}
+          {lexemes.length > 0 && (
+            <details style={styles.details}>
+              <summary style={styles.summary}>Plain Text Output</summary>
+              <div style={styles.plainActions}>
+                <button onClick={handleCopy} style={styles.button}>
+                  Copy
+                </button>
+                {copyMessage && <span style={styles.copyMsg}>{copyMessage}</span>}
+              </div>
+              <pre style={styles.pre}>
+                {lexemes.map((lex) => `${lex.value.padEnd(16)} : ${lex.token.padEnd(16)} [Line ${lex.line}, Col ${lex.col}]`).join('\n')}
+              </pre>
+            </details>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -246,9 +257,11 @@ export default function LexerInterface() {
 // inline styles para sa UI
 const styles = {
   page: {
-    maxWidth: '900px',
+    display: 'flex',
+    'flex-direction': 'column',
+    maxWidth: '100vw',
     margin: '0 auto',
-    padding: '24px 16px 48px',
+    padding: '1.5rem 2rem',
     fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
     color: '#ecebe6',
     minHeight: '100vh',
@@ -257,40 +270,35 @@ const styles = {
     marginBottom: '20px',
   },
   title: {
-    margin: '0 0 4px',
-    fontSize: '26px',
-    fontWeight: 700,
-    color: '#ecebe6',
+    fontSize: '2rem',
   },
   titleIcon: {
     fontSize: '28px',
   },
   subtitle: {
-    margin: '0 0 16px',
     color: '#9a9890',
-    fontSize: '14px',
   },
   textarea: {
     width: '100%',
     minHeight: '200px',
-    padding: '14px',
+    padding: '1rem',
     resize: 'vertical',
     border: '1px solid #3a3a36',
     borderRadius: '10px',
     background: '#21211f',
     color: '#ecebe6',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
-    fontSize: '14px',
     lineHeight: '1.5',
     outline: 'none',
     boxSizing: 'border-box',
+    'scrollbar-width': 'thin'
   },
   toolbar: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '8px',
+    gap: '0.5rem',
     alignItems: 'center',
-    margin: '12px 0 18px',
+    marginTop: '0.75rem',
   },
   button: {
     padding: '8px 14px',
@@ -326,9 +334,12 @@ const styles = {
     borderRadius: '10px',
     background: '#21211f',
     overflow: 'hidden',
+    'overflow-x': 'auto',
+    '-webkit-overflow-scrolling': 'touch'
   },
   table: {
     width: '100%',
+    tableLayout: 'fixed',
     borderCollapse: 'collapse',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '14px',
@@ -347,7 +358,8 @@ const styles = {
   td: {
     padding: '8px 14px',
     borderBottom: '1px solid #2a2a28',
-    whiteSpace: 'pre',
+    whiteSpace: 'normal',
+    overflowWrap: 'anywhere'
   },
   trEven: {
     background: '#21211f',
