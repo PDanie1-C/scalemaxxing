@@ -172,6 +172,8 @@ const styles = {
     fontWeight: 600,
   },
   resultsContainer: {
+    maxHeight: '18rem',
+    overflowY: 'auto',
     border: '1px solid #3a3a36',
     borderRadius: '10px',
     background: 'var(--tb-bgclr-accent)',
