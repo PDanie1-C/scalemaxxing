@@ -3,7 +3,7 @@
 
    # Leading indentation before single-line comment
 
-dim    mass       itemCount   =      42    [kg]
+dim    itemCount: int   =      42    [kg]
 
 #* 
    Multi-line block comment
@@ -12,7 +12,7 @@ dim    mass       itemCount   =      42    [kg]
    without emitting any tokens!
 *#
 
-unit	mass	compute(	mass	val1,	mass	val2	):
+unit	float	compute(	float	val1,	float	val2	):
 	#* Nested comment between statements *#
 	pure	val1	+	val2
 
@@ -22,4 +22,3 @@ dim	x	=	10	# End-of-line comment
 #* Block comment with special symbols: !@#$%^&*()_+={}[]:"<>? *#
 
 weight		"Execution completed cleanly"
-

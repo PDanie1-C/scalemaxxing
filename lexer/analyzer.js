@@ -412,7 +412,7 @@ export class LexicalAnalyzer {
     }
 
     return createLexeme(
-      isSingleQuote && !isTriple ? Tokens.CHAR_LIT : Tokens.STRING_LIT,
+      Tokens.STRING_LIT,
       this.lexeme,
       this.tokenStartLine,
       this.tokenStartCol
