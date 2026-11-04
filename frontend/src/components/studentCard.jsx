@@ -1,12 +1,16 @@
 import '../styles/style.css';
 
-function StudentCard({id, name, image}) {
+function StudentCard({id, name, image, role}) {
   return (
     <div className="student-card">
-      <div >
-        <img className="student-image" src={image} alt=""></img>
+      <div className='student-image'>
+        <img src={image} alt=""></img>
       </div>
-      <p className="student-name">{name}</p>
+      <div>
+        <p className="student-name">{name}</p>
+        <p className='student-role'>{role}</p>
+      </div>
+      
     </div>
   );
 }

@@ -6,7 +6,34 @@
 
   --btn-clr: #5c5b9b;
   --btn-clr-accent: #ec8239;
+
+  --bgr-clr-accent: #363592;
+  --bgr-clr: #000000;
+
+  --font-clr: #ffffff;
+  --font-otr-clr: #000000;
+
+  --tb-bgclr: #191917;
+  --tb-bgclr-accent: #191917;
+
+  --abt-bgclr: 0, 0, 0;
 }
+
+[data-theme="light"] {
+  --bgr-clr-accent: #ffffff;
+  --bgr-clr:#7876bf;
+
+  --btn-clr: #ffffff;
+
+  --font-clr: #000000;
+
+  --tb-bgclr: #e6e6e6;
+  --tb-bgclr-accent: #ffffff;
+
+  --abt-bgclr: 255, 255, 255;
+
+}
+
 
 *, 
 *::before,

@@ -5,7 +5,7 @@ const styles = {
     maxWidth: '100vw',
     margin: '0 auto',
     fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
-    color: '#ecebe6',
+    color: 'var(--font-clr)',
     minHeight: '100vh',
   },
   header: {
@@ -14,14 +14,15 @@ const styles = {
   title: {
     fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
     fontWeight: 700,
-    color: '#ecebe6',
+    color: 'var(--btn-clr-accent)',
     letterSpacing: '1px',
     fontFamily: "'norwester', sans-serif"
   },
 
   subtitle: {
     margin: '0',
-    color: '#9a9890',
+    color: 'var(--font-clr)',
+    fontWeight: 500
   },
 
   editorContainer: {
@@ -30,16 +31,16 @@ const styles = {
     maxHeight: '480px',
     border: '1px solid #3a3a36',
     borderRadius: '10px',
-    background: '#21211f',
+    background: 'var(--tb-bgclr)',
     overflow: 'hidden',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
   },
   
   gutter: {
     padding: '14px 10px',
-    background: '#191917',
+    background: 'var(--tb-bgclr)',
     borderRight: '1px solid #30302c',
-    color: '#5f5e58',
+    color: 'var(--font-clr)',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '13px',
     lineHeight: '1.6',
@@ -61,8 +62,8 @@ const styles = {
     padding: '1rem',
     border: 'none',
     outline: 'none',
-    background: 'transparent',
-    color: '#ecebe6',
+    background: 'rgba(0, 0, 0, 0.1)',
+    color: 'var(--font-clr)',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '0.9rem',
     lineHeight: '1.6',
@@ -81,8 +82,8 @@ const styles = {
     padding: '8px 14px',
     border: '1px solid #3a3a36',
     borderRadius: '8px',
-    background: '#21211f',
-    color: '#ecebe6',
+    background: 'var(--btn-clr)',
+    color: 'var(--font-clr)',
     fontFamily: 'inherit',
     fontSize: '13px',
     fontWeight: 500,
@@ -95,7 +96,7 @@ const styles = {
   buttonPrimary: {
     background: 'var(--btn-clr-accent)',
     borderColor: 'var(--btn-clr-accent)',
-    color: '#0c1017',
+    color: 'var(--font-otr-clr)',
     fontWeight: 600,
   },
   statusIndicator: {
@@ -119,7 +120,7 @@ const styles = {
     fontWeight: 500,
   },
   statsContainer: {
-    background: '#191917',
+    background: 'var(--tb-bgclr-accent)',
     border: '1px solid #3a3a36',
     borderRadius: '10px',
     padding: '12px 14px',
@@ -136,11 +137,11 @@ const styles = {
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    color: '#9a9890',
+    color: 'var(--font-clr)',
   },
   filterHint: {
     fontSize: '12px',
-    color: '#686761',
+    color: '#404040',
   },
   pillGroup: {
     display: 'flex',
@@ -151,7 +152,7 @@ const styles = {
     padding: '5px 10px',
     borderRadius: '6px',
     border: '1px solid #30302c',
-    background: '#21211f',
+    background: 'var(--tb-bgclr)',
     color: '#c0beba',
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '12px',
@@ -173,7 +174,7 @@ const styles = {
   resultsContainer: {
     border: '1px solid #3a3a36',
     borderRadius: '10px',
-    background: '#21211f',
+    background: 'var(--tb-bgclr-accent)',
     overflowX: 'auto',
     WebkitOverflowScrolling: 'touch'
   },
@@ -185,7 +186,7 @@ const styles = {
     margin: '0 0 6px',
     fontSize: '16px',
     fontWeight: 600,
-    color: '#ecebe6',
+    color: 'var(--font-clr)',
   },
   emptySubtitle: {
     margin: '0',
@@ -193,7 +194,7 @@ const styles = {
     color: '#9a9890',
   },
   muted: {
-    color: '#9a9890',
+    color: '#var(--font-clr)',
     textAlign: 'center',
     padding: '40px 0',
     fontSize: '14px',
@@ -208,12 +209,12 @@ const styles = {
     padding: '10px 14px',
     textAlign: 'left',
     borderBottom: '1px solid #3a3a36',
-    color: '#9a9890',
+    color: 'var(--font-clr)',
     fontSize: '11px',
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    background: '#181816',
+    background: 'var(--tb-bgclr)',
   },
   td: {
     padding: '8px 14px',
@@ -222,14 +223,14 @@ const styles = {
     overflowWrap: 'anywhere'
   },
   trEven: {
-    background: '#21211f',
+    background: 'var(--tb-bgclr-accent)',
   },
   trOdd: {
-    background: '#1c1c1a',
+    background: 'var(--tb-bgclr)',
   },
   lexemeCell: {
     fontWeight: 500,
-    color: '#ffffff',
+    color: 'var(--font-clr)',
     maxWidth: '240px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -250,7 +251,7 @@ const styles = {
     marginTop: '16px',
     border: '1px solid #3a3a36',
     borderRadius: '10px',
-    background: '#191917',
+    background: 'var(--tb-bgclr)',
     overflow: 'hidden',
   },
   summary: {
@@ -258,7 +259,7 @@ const styles = {
     cursor: 'pointer',
     fontWeight: 600,
     fontSize: '13px',
-    color: '#c0beba',
+    color: 'var(--font-clr)',
     userSelect: 'none',
   },
   plainActions: {
@@ -267,7 +268,7 @@ const styles = {
     gap: '8px',
     padding: '8px 16px',
     borderBottom: '1px solid #2a2a28',
-    background: '#151514',
+    background: 'var(--tb-bgclr-accent)',
   },
   copyMsg: {
     color: '#6fd9a0',
@@ -280,10 +281,10 @@ const styles = {
     fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
     fontSize: '12px',
     lineHeight: '1.5',
-    color: '#ecebe6',
+    color: 'var(--font-clr)',
     maxHeight: '300px',
     overflow: 'auto',
-    background: '#121211',
+    background: 'var(--tb-bgclr-accent)',
   },
 };
 

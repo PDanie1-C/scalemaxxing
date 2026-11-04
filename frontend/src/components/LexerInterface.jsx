@@ -10,7 +10,7 @@ import TokenBreakdown from './tokenBreakdown';
 import ResultsTable from './resultsTable';
 import PlaintextOutput from './plaintextOutput';
 
-import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { MdDarkMode, MdOutlineLightMode } from "react-icons/md";
 import logo from '../assets/logo.svg';
 
 // kulay ng bawat token sa table at badges
@@ -74,7 +74,7 @@ function getTokenCategory(token) {
   }
 }
 
-export default function LexerInterface({onAbout}) {
+export default function LexerInterface({onAbout, setLightMode, setDarkMode}) {
   const [sourceCode, setSourceCode] = useState('');
   const [lexemes, setLexemes] = useState([]);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
@@ -215,13 +215,12 @@ export default function LexerInterface({onAbout}) {
         <div className='right-settings'>
           <button onClick={onAbout}>About Us</button>
           <div className='header-group container-button'>
-            <button><MdLightMode/></button>
-            <button><MdDarkMode/></button>
+            <button className='light' onClick={setLightMode}><MdOutlineLightMode/></button>
+            <button className='dark' onClick={setDarkMode}><MdDarkMode /></button>
           </div>
         </div>
       </div>
       
-
       <div className="container-flex main-container"> 
         {/* Code Editor na may Sticky Synchronized Line Gutter */}
         <CodeEditor 
