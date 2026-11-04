@@ -1,0 +1,21 @@
+# Test 06: Lexical Error Detection and Fault Tolerance
+# 1. Unterminated string and character literals
+dim rune badString = "unclosed string without end quote
+dim rune badChar = 'unclosed char
+
+# 2. Unrecognized symbols and invalid characters
+pure invalidSymbol1 = ~42
+dim mass invalidSymbol2 = $100
+pure ternaryCheck = flag ? 1 : 0
+pure bitwise = 5 ^ 3 | 2 & 1
+pure backtick = `invalid`
+
+# 3. Malformed numeric or scientific notation tokens
+dim span malformedFloat = 10.5.2
+pure malformedExponent = 1e
+pure invalidExpSign = 2.5e+
+
+# 4. Valid recovery after lexical errors on subsequent lines
+dim mass validRecovery = 500 [kg]
+emit(validRecovery)
+
