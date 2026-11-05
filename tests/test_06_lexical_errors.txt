@@ -1,0 +1,42 @@
+# Test 06: Lexical Error Detection and Fault Tolerance
+# 1. Unterminated string and character literals
+dim string badString = "unclosed string without end quote
+dim badChar = 'unclosed char
+
+# 2. Identifiers starting with digits (Rule d violation)
+pure badIdent1 = 10x
+dim badIdent2 = 123var
+
+# 3. Leading zeroes in decimal integer and float literals
+pure invalidLeadingZero = 007
+pure invalidLeadingZeroFloat = 00.5
+
+# 4. Trailing decimal points & invalid attribute attachments on numbers
+pure trailingDot = 10.
+pure badAttribute = 10.weight
+dim malformedFloat = 10.5.2
+
+# 5. Malformed scientific notation exponents
+pure malformedExponent = 1e
+pure invalidExpSign = 1e+
+pure badExpFraction = 2.5e-
+pure fractionalExp = 1e2.5
+
+# 6. Unrecognized symbols and invalid characters
+pure invalidSymbol1 = ~42
+dim invalidSymbol2 = $100
+pure ternaryCheck = flag ? 1 : 0
+pure bitwise = 5 | 2 & 1
+pure backtick = `invalid`
+
+# 7. Misaligned unindentation level (IndentationError)
+when (status == 1):
+        x = 10
+      y = 20
+
+# 8. Valid recovery after lexical errors on subsequent lines
+dim validRecovery = 500 [kg]
+emit(validRecovery)
+
+# 9. Unterminated multi-line block comment at EOF
+#* Unterminated multi-line comment that reaches end of file

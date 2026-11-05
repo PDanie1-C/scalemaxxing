@@ -1,0 +1,57 @@
+/* ─── Reset and Base ─── */
+@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+:root {
+  color-scheme: dark;
+
+  --btn-clr: #5c5b9b;
+  --btn-clr-accent: #ec8239;
+
+  --bgr-clr-accent: #363592;
+  --bgr-clr: #000000;
+
+  --font-clr: #ffffff;
+  --font-otr-clr: #000000;
+
+  --tb-bgclr: #191917;
+  --tb-bgclr-accent: #191917;
+
+  --abt-bgclr: 0, 0, 0;
+}
+
+[data-theme="light"] {
+  --bgr-clr-accent: #ffffff;
+  --bgr-clr:#7876bf;
+
+  --btn-clr: #ffffff;
+
+  --font-clr: #000000;
+
+  --tb-bgclr: #e6e6e6;
+  --tb-bgclr-accent: #ffffff;
+
+  --abt-bgclr: 255, 255, 255;
+
+}
+
+
+*, 
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  color: #ecebe6;
+  font-family: "Source Code Pro", system-ui, -apple-system, monospace, Arial, sans-serif;
+}
+
+.shrikhand-title {
+  font-family: "Shrikhand", serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #f77116;
+}

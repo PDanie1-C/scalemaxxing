@@ -1,0 +1,24 @@
+# Test 05: Comments and Whitespaces Discard
+# Single-line comment at the beginning of the file
+
+   # Leading indentation before single-line comment
+
+dim    itemCount: int   =      42    [kg]
+
+#* 
+   Multi-line block comment
+   enclosed inside hash-asterisk delimiters.
+   This whole block must be completely discarded
+   without emitting any tokens!
+*#
+
+unit	float	compute(	float	val1,	float	val2	):
+	#* Nested comment between statements *#
+	pure	val1	+	val2
+
+# Inline comments after code
+dim	x	=	10	# End-of-line comment
+
+#* Block comment with special symbols: !@#$%^&*()_+={}[]:"<>? *#
+
+weight		"Execution completed cleanly"
