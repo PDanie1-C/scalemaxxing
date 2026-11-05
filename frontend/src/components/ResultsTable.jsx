@@ -1,10 +1,19 @@
 import '../styles/style.css';
-import styles from '../styles/inlineStyles'
+import styles from '../styles/inlineStyles';
 
-function ResultsTable({isAnalyzed, sourceCode, handleAnalyze, lexemes, filteredLexemes, selectedFilter, getTokenColor, getTokenCategory }) {
-	return (
-		<>
-			<div style={styles.resultsContainer}>
+function ResultsTable({
+  isAnalyzed,
+  sourceCode,
+  handleAnalyze,
+  lexemes,
+  filteredLexemes,
+  selectedFilter,
+  getTokenColor,
+  getTokenCategory,
+}) {
+  return (
+    <>
+      <div style={styles.resultsContainer}>
         {!isAnalyzed ? (
           <div style={styles.emptyState}>
             <p style={styles.emptyTitle}>
@@ -56,7 +65,22 @@ function ResultsTable({isAnalyzed, sourceCode, handleAnalyze, lexemes, filteredL
                   <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{i + 1}</td>
                   <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{lex.line}</td>
                   <td style={{ ...styles.td, color: '#9a9890', textAlign: 'center' }}>{lex.col}</td>
-                  <td style={{ ...styles.td, ...styles.lexemeCell }}>{lex.value}</td>
+                  <td style={{ ...styles.td, ...styles.lexemeCell }} title={lex.message || ''}>
+                    {lex.value}
+                    {lex.message && (
+                      <div
+                        style={{
+                          fontSize: '0.74rem',
+                          color: '#ff8a7a',
+                          marginTop: '2px',
+                          fontWeight: 'normal',
+                          fontStyle: 'italic',
+                        }}
+                      >
+                        {lex.message}
+                      </div>
+                    )}
+                  </td>
                   <td style={{ ...styles.td, color: getTokenColor(lex.token) }}>{lex.token}</td>
                   <td style={{ ...styles.td, ...styles.categoryCell }}>
                     <span
@@ -75,8 +99,8 @@ function ResultsTable({isAnalyzed, sourceCode, handleAnalyze, lexemes, filteredL
           </table>
         )}
       </div>
-		</>
-	)
+    </>
+  );
 }
 
 export default ResultsTable;
