@@ -21,6 +21,9 @@ export const CharClasses = Object.freeze({
 export class LexicalAnalyzer {
   constructor(statement) {
     this.input = statement || '';
+    if (this.input.charCodeAt(0) === 0xFEFF) {
+      this.input = this.input.slice(1);
+    }
     this.length = this.input.length;
     this.index = 0;
 
@@ -109,6 +112,7 @@ export class LexicalAnalyzer {
       case '<':
       case '>':
       case '!':
+      case '^':
         return CharClasses.OPERATOR;
       case '(':
       case ')':
@@ -134,18 +138,34 @@ export class LexicalAnalyzer {
 
   // sub-automaton para laktawan ang single-line at multi-line comments
   skipComment() {
+    const startLine = this.charLine;
+    const startCol = this.charCol;
+
     if (this.nextChar === '#') {
       if (this.peekChar() === '*') {
         // Multi-line comment: #* ... *#
         this.getChar(); // consume '#'
         this.getChar(); // consume '*'
+        let isClosed = false;
         while (this.charClass !== CharClasses.EOF) {
           if (this.nextChar === '*' && this.peekChar() === '#') {
             this.getChar(); // consume '*'
             this.getChar(); // consume '#'
+            isClosed = true;
             break;
           }
           this.getChar();
+        }
+        if (!isClosed) {
+          this.pendingTokens.push(
+            createLexeme(
+              Tokens.ERROR,
+              '#*',
+              startLine,
+              startCol,
+              `Unterminated multi-line comment starting at line ${startLine}, col ${startCol}`
+            )
+          );
         }
       } else {
         // Single-line comment: # hanggang newline
@@ -157,18 +177,30 @@ export class LexicalAnalyzer {
       // Bracket multi-line comment: [# ... #]
       this.getChar(); // consume '['
       this.getChar(); // consume '#'
+      let isClosed = false;
       while (this.charClass !== CharClasses.EOF) {
         if (this.nextChar === '#' && this.peekChar() === ']') {
           this.getChar(); // consume '#'
           this.getChar(); // consume ']'
+          isClosed = true;
           break;
         }
         this.getChar();
       }
+      if (!isClosed) {
+        this.pendingTokens.push(
+          createLexeme(
+            Tokens.ERROR,
+            '[#',
+            startLine,
+            startCol,
+            `Unterminated multi-line comment starting at line ${startLine}, col ${startCol}`
+          )
+        );
+      }
     }
   }
 
-  // sub-automaton para sa block scoping indentation sa simula ng bagong linya
   handleLineIndentation() {
     while (this.atLineStart && this.charClass !== CharClasses.EOF) {
       let indentCount = 0;
@@ -193,6 +225,10 @@ export class LexicalAnalyzer {
       // comment-only line: i-skip ang comment at manatiling atLineStart
       if (this.nextChar === '#' || (this.nextChar === '[' && this.peekChar() === '#')) {
         this.skipComment();
+        if (this.pendingTokens.length > 0) {
+          this.atLineStart = false;
+          break;
+        }
         if (this.nextChar === '\n' || this.nextChar === '\r') {
           if (this.nextChar === '\r' && this.peekChar() === '\n') {
             this.getChar();
@@ -214,9 +250,21 @@ export class LexicalAnalyzer {
         this.indentStack.push(indentCount);
         this.pendingTokens.push(createLexeme(Tokens.INDENT, 'INDENT', this.charLine, 1));
       } else if (indentCount < topIndent) {
-        while (this.indentStack.length > 1 && this.indentStack[this.indentStack.length - 1] > indentCount) {
-          this.indentStack.pop();
-          this.pendingTokens.push(createLexeme(Tokens.DEDENT, 'DEDENT', this.charLine, 1));
+        if (!this.indentStack.includes(indentCount)) {
+          this.pendingTokens.push(
+            createLexeme(
+              Tokens.ERROR,
+              'INDENT_ERROR',
+              this.charLine,
+              1,
+              `IndentationError: unindent does not match any outer indentation level (line ${this.charLine}, col 1)`
+            )
+          );
+        } else {
+          while (this.indentStack.length > 1 && this.indentStack[this.indentStack.length - 1] > indentCount) {
+            this.indentStack.pop();
+            this.pendingTokens.push(createLexeme(Tokens.DEDENT, 'DEDENT', this.charLine, 1));
+          }
         }
       }
 
@@ -239,6 +287,9 @@ export class LexicalAnalyzer {
         }
       } else if (this.nextChar === '#' || (this.nextChar === '[' && this.peekChar() === '#')) {
         this.skipComment();
+        if (this.pendingTokens.length > 0) {
+          break;
+        }
       } else {
         break;
       }
@@ -282,9 +333,12 @@ export class LexicalAnalyzer {
       this.getChar();
     }
 
+    const intPrefix = this.lexeme;
+    const hasLeadingZero = intPrefix.length > 1 && intPrefix.startsWith('0');
+
     let isFloat = false;
 
-    // Fractional part: Trailing dot check
+    // Fractional part check
     if (this.nextChar === '.') {
       const charAfterDot = this.peekChar();
       if (charAfterDot >= '0' && charAfterDot <= '9') {
@@ -295,37 +349,131 @@ export class LexicalAnalyzer {
           this.addChar();
           this.getChar();
         }
-      } else {
-        // Dot na hindi sinundan ng digit (e.g. 10.weight):
-        // Wag i-consume ang '.' para ma-evaluate ito bilang DELIMITER sa susunod na tawag
-        return createLexeme(Tokens.INTEGER_LIT, this.lexeme, this.tokenStartLine, this.tokenStartCol);
-      }
-    }
 
-    // Scientific notation: e o E na may optional + o - at kahit isang digit (e.g. 1e-5, 2.5e3, 10E+2)
-    if (this.nextChar === 'e' || this.nextChar === 'E') {
-      let nextC = this.peekChar(0);
-      if (nextC === '+' || nextC === '-') {
-        nextC = this.peekChar(1);
-      }
-
-      if (nextC >= '0' && nextC <= '9') {
-        // Valid scientific notation exponent
-        isFloat = true;
-        this.addChar(); // consume 'e' o 'E'
-        this.getChar();
-
-        if (this.nextChar === '+' || this.nextChar === '-') {
-          this.addChar(); // consume sign
-          this.getChar();
+        // Check para sa multiple decimal points (e.g. 10.5.2)
+        if (this.nextChar === '.') {
+          while (
+            this.nextChar === '.' ||
+            this.charClass === CharClasses.DIGIT ||
+            this.charClass === CharClasses.LETTER ||
+            this.nextChar === '_'
+          ) {
+            this.addChar();
+            this.getChar();
+          }
+          return createLexeme(
+            Tokens.ERROR,
+            this.lexeme,
+            this.tokenStartLine,
+            this.tokenStartCol,
+            `Malformed float literal: multiple decimal points in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+          );
         }
-
-        while (this.charClass === CharClasses.DIGIT) {
+      } else {
+        // Dot na hindi sinundan ng digit (e.g. 10., 10.weight, 10..5):
+        this.addChar(); // consume '.'
+        this.getChar();
+        while (this.nextChar === '.') {
           this.addChar();
           this.getChar();
         }
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Malformed float literal: expected digits after decimal point in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
       }
-      // Kung hindi sinusundan ng sign/digit (e.g. 10emit), wag galawin ang 'e'
+    }
+
+    // Scientific notation: e o E na may optional + o - (e.g. 1e-5, 2.5e3, 10E+2)
+    if (this.nextChar === 'e' || this.nextChar === 'E') {
+      this.addChar(); // consume 'e' o 'E'
+      this.getChar();
+
+      if (this.nextChar === '+' || this.nextChar === '-') {
+        this.addChar(); // consume sign
+        this.getChar();
+      }
+
+      let expDigits = 0;
+      while (this.charClass === CharClasses.DIGIT) {
+        this.addChar();
+        this.getChar();
+        expDigits++;
+      }
+
+      if (expDigits === 0) {
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Malformed scientific exponent: missing digits after exponent in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      }
+
+      isFloat = true;
+
+      // Disallow fractional exponents (e.g. 1e2.5)
+      if (this.nextChar === '.') {
+        while (
+          this.nextChar === '.' ||
+          this.charClass === CharClasses.DIGIT ||
+          this.charClass === CharClasses.LETTER ||
+          this.nextChar === '_'
+        ) {
+          this.addChar();
+          this.getChar();
+        }
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Malformed scientific exponent: exponents cannot contain decimal points in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      }
+    }
+
+    // Disallow identifiers starting with digits (e.g. 123var, 10x, 10_var)
+    if (this.charClass === CharClasses.LETTER || this.nextChar === '_') {
+      while (
+        this.charClass === CharClasses.LETTER ||
+        this.charClass === CharClasses.DIGIT ||
+        this.nextChar === '_'
+      ) {
+        this.addChar();
+        this.getChar();
+      }
+      return createLexeme(
+        Tokens.ERROR,
+        this.lexeme,
+        this.tokenStartLine,
+        this.tokenStartCol,
+        `Invalid identifier starting with digit: '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+      );
+    }
+
+    if (hasLeadingZero) {
+      if (isFloat) {
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `SyntaxError: leading zeros in decimal literals are not permitted in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      } else {
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `SyntaxError: leading zeros in decimal integer literals are not permitted: '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      }
     }
 
     return createLexeme(
@@ -336,7 +484,106 @@ export class LexicalAnalyzer {
     );
   }
 
-  // sub-automaton para sa string at char literals na may escape sequences at triple-quote support
+  // sub-automaton para sa leading-dot float literals (e.g. .5, .25, .5e-3)
+  leadingDotFloatAutomaton() {
+    this.addChar(); // consume '.'
+    this.getChar();
+
+    while (this.charClass === CharClasses.DIGIT) {
+      this.addChar();
+      this.getChar();
+    }
+
+    // Check para sa multiple decimal points (e.g. .5.2)
+    if (this.nextChar === '.') {
+      while (
+        this.nextChar === '.' ||
+        this.charClass === CharClasses.DIGIT ||
+        this.charClass === CharClasses.LETTER ||
+        this.nextChar === '_'
+      ) {
+        this.addChar();
+        this.getChar();
+      }
+      return createLexeme(
+        Tokens.ERROR,
+        this.lexeme,
+        this.tokenStartLine,
+        this.tokenStartCol,
+        `Malformed float literal: multiple decimal points in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+      );
+    }
+
+    // Scientific notation: e o E na may optional + o - (e.g. .5e-3)
+    if (this.nextChar === 'e' || this.nextChar === 'E') {
+      this.addChar(); // consume 'e' o 'E'
+      this.getChar();
+
+      if (this.nextChar === '+' || this.nextChar === '-') {
+        this.addChar(); // consume sign
+        this.getChar();
+      }
+
+      let expDigits = 0;
+      while (this.charClass === CharClasses.DIGIT) {
+        this.addChar();
+        this.getChar();
+        expDigits++;
+      }
+
+      if (expDigits === 0) {
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Malformed scientific exponent: missing digits after exponent in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      }
+
+      // Disallow fractional exponents (e.g. .5e2.5)
+      if (this.nextChar === '.') {
+        while (
+          this.nextChar === '.' ||
+          this.charClass === CharClasses.DIGIT ||
+          this.charClass === CharClasses.LETTER ||
+          this.nextChar === '_'
+        ) {
+          this.addChar();
+          this.getChar();
+        }
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Malformed scientific exponent: exponents cannot contain decimal points in '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
+      }
+    }
+
+    // Disallow identifiers with letters directly attached (e.g. .5x)
+    if (this.charClass === CharClasses.LETTER || this.nextChar === '_') {
+      while (
+        this.charClass === CharClasses.LETTER ||
+        this.charClass === CharClasses.DIGIT ||
+        this.nextChar === '_'
+      ) {
+        this.addChar();
+        this.getChar();
+      }
+      return createLexeme(
+        Tokens.ERROR,
+        this.lexeme,
+        this.tokenStartLine,
+        this.tokenStartCol,
+        `Invalid identifier starting with digit: '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+      );
+    }
+
+    return createLexeme(Tokens.FLOAT_LIT, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+  }
+
   stringAutomaton() {
     const quoteChar = this.nextChar;
 
@@ -407,7 +654,7 @@ export class LexicalAnalyzer {
     }
 
     if (!isClosed) {
-      return createLexeme(Tokens.ERROR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      return createLexeme(Tokens.ERROR, this.lexeme, this.tokenStartLine, this.tokenStartCol, `Unterminated string literal starting at line ${this.tokenStartLine}, col ${this.tokenStartCol}`);
     }
 
     return createLexeme(
@@ -550,6 +797,12 @@ export class LexicalAnalyzer {
         return createLexeme(Tokens.RELATIONAL_OP, this.lexeme, this.tokenStartLine, this.tokenStartCol);
       }
 
+      case '^': {
+        this.addChar();
+        this.getChar();
+        return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
       case '!': {
         this.addChar();
         this.getChar();
@@ -561,13 +814,32 @@ export class LexicalAnalyzer {
         return createLexeme(Tokens.OPERATOR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
       }
 
-      // standard delimiters
-      case '[':
+      // Dedicated block para sa period / leading-dot float
+      case '.': {
+        const charAfterDot = this.peekChar();
+        if (charAfterDot >= '0' && charAfterDot <= '9') {
+          return this.leadingDotFloatAutomaton();
+        }
+        this.addChar();
+        this.getChar();
+        return createLexeme(Tokens.DELIMITER, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      // Dedicated bracket comment block
+      case '[': {
         if (this.peekChar() === '#') {
           this.skipComment();
+          if (this.pendingTokens.length > 0) {
+            return this.pendingTokens.shift();
+          }
           return this.lex();
         }
-        // falls through sa unified delimiter block
+        this.addChar();
+        this.getChar();
+        return createLexeme(Tokens.DELIMITER, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+      }
+
+      // Standard punctuation delimiters
       case '(':
       case ')':
       case '{':
@@ -576,7 +848,6 @@ export class LexicalAnalyzer {
       case ',':
       case ':':
       case ';':
-      case '.':
       case '@': {
         this.addChar();
         this.getChar();
@@ -586,7 +857,13 @@ export class LexicalAnalyzer {
       default: {
         this.addChar();
         this.getChar();
-        return createLexeme(Tokens.ERROR, this.lexeme, this.tokenStartLine, this.tokenStartCol);
+        return createLexeme(
+          Tokens.ERROR,
+          this.lexeme,
+          this.tokenStartLine,
+          this.tokenStartCol,
+          `Unrecognized symbol: '${this.lexeme}' at line ${this.tokenStartLine}, col ${this.tokenStartCol}`
+        );
       }
     }
   }

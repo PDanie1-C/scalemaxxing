@@ -10,10 +10,14 @@ pure multiplier = 1.5, scaleFactor = 2.0, limit = 100
 # Custom unit definition
 unit Force = kg * m / (s * s);
 unit Velocity = m / s;
+unit Acceleration = m / s^2;
+unit Pressure = kg / (m * s^2);
 
 # Pure scalar variable declarations without physical units
 pure PI = 3.14159265;
 pure offset = 0.5;
+pure leadingDot = .5;
+pure zeroIndex = 0;
 
 # Scientific notation literals with dimensional units
 dim wavelength = 1.5e-6 [m]
